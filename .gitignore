@@ -1,0 +1,4 @@
+# ignore emacs packages
+elpa
+auto-save-list
+backups
