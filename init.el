@@ -91,6 +91,11 @@
 ;; 3. Emacs Development Modes
 ;; ----------------------------------------------------------------------
 
+;; Company Complete
+;; company-mode.github.io
+(add-hook 'after-init-hook 'global-company-mode)
+
+
 ;; Impatient Mode
 ;; wikemacs.org/wiki/Markdown#Live_preview_as_you_type
 
@@ -114,7 +119,7 @@ src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>" (buffer-subs
  '(linum-format " %7i ")
  '(package-selected-packages
    (quote
-    (impatient-mode groovy-mode sublime-themes markdown-mode))))
+    (company-quickhelp company impatient-mode groovy-mode sublime-themes markdown-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
