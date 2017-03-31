@@ -7,15 +7,31 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
-(package-initialize)
 
+;; add path to settings files
+;;(add-to-list 'load-path "~/.emacs.d/settings")
+
+;; setup package management
 (require 'package)
 (add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/") t)
-
+	     '("melpa" . "https://melpa.org/packages/"))
+(when (< emacs-major-version 24)
+  ;; for important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
 
 ;; 1. Emacs Configuration Settings
 ;; ----------------------------------------------------------------------
+
+(require 'ido)
+(ido-mode t)
+
+(ac-config-default)
+(global-auto-complete-mode t)
+
+;; show the current line and column numbers in the stats bar
+(line-number-mode t)
+(column-number-mode t)
 
 ;; Turn off mouse interface early in startup to avoid momentary display
 (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
@@ -51,7 +67,6 @@
 	(linum-mode 1)
 	(goto-line (read-number "Goto line: ")))
     (linum-mode -1)))
-
 
 ;; Full screen magit-status
 ;; spend a weekend looking into maggit
@@ -91,11 +106,6 @@
 ;; 3. Emacs Development Modes
 ;; ----------------------------------------------------------------------
 
-;; Company Complete
-;; company-mode.github.io
-(add-hook 'after-init-hook 'global-company-mode)
-
-
 ;; Impatient Mode
 ;; wikemacs.org/wiki/Markdown#Live_preview_as_you_type
 
@@ -105,8 +115,46 @@
 src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
    (current-buffer)))
 
-		     
-		     
+;; Python Mode
+(elpy-enable)
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+
+;; Web Mode
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.html?\\'".web-mode))
+
+(setq web-mode-engines-alist '(("django" . "\\.html\\'")))
+
+(setq web-mode-markup-indent-offset 2)
+(setq web-mode-code-indent-offset 2)
+(setq web-mode-css-indent-offset 2)
+
+(setq web-mode-enable-auto-pairing t)
+(setq web-mode-enable-auto-expanding t)
+(setq web-mode-enable-css-colorization t)
+
+
+
+;; www.jesshamrick.com/2012/09/18/emacs-as-a-python-ide/
+;;(require 'python-mode)
+; use IPython
+;;(setq-default py-shell-name "ipython")
+;;(setq-default py-which-bufname "IPython")
+; use the wx backend, for both mayavi and matplot lib
+;;(setq py-python-command-args
+;;      '("--gui=wx" "--pylab=wx" "--colors" "Linux"))
+;;(setq py-force-py-shell-name-p t)
+
+; switch to the interpreter after executing code
+;;(setq py-shell-switch-buffers-on-execute-p t)
+;;(setq py-switch-buffers-on-execute-p t)
+; don't split windows
+;;(setq py-split-windows-on-execute-p nil)
+; try to automagically figure out indentation
+;;(setq py-smart-indentation t)
+
+		    		     
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -119,7 +167,7 @@ src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>" (buffer-subs
  '(linum-format " %7i ")
  '(package-selected-packages
    (quote
-    (company-quickhelp company impatient-mode groovy-mode sublime-themes markdown-mode))))
+    (web-mode-edit-element web-mode jedi elpy auto-complete anaconda-mode py-autopep8 impatient-mode groovy-mode sublime-themes markdown-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
