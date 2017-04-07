@@ -14,7 +14,8 @@
 ;; setup package management
 (require 'package)
 (add-to-list 'package-archives
-	     '("melpa" . "https://melpa.org/packages/"))
+	     '("melpa" . "https://melpa.org/packages/")
+	     '("elpy" . "http://jorgenschaefer.github.io/packages/"))
 (when (< emacs-major-version 24)
   ;; for important compatibility libraries like cl-lib
   (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/")))
@@ -26,8 +27,12 @@
 (require 'ido)
 (ido-mode t)
 
+;; auto-complete enables basic completion
+(require 'auto-complete-config)
 (ac-config-default)
-(global-auto-complete-mode t)
+(setq ac-show-menu-immediately-on-auto-complete t)
+(add-to-list 'ac-sources 'ac-source-jedi-direct)
+;;(global-auto-complete-mode t)
 
 ;; show the current line and column numbers in the stats bar
 (line-number-mode t)
@@ -67,6 +72,14 @@
 	(linum-mode 1)
 	(goto-line (read-number "Goto line: ")))
     (linum-mode -1)))
+
+;; trick emacs into not asking to close background processes on exit
+(require 'cl-lib)
+(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+  "Prevent annoying \"Active processes exist\" query when you kill Emacs."
+  (cl-letf (((symbol-function #'process-list) (lambda ())))
+    ad-do-it))
+
 
 ;; Full screen magit-status
 ;; spend a weekend looking into maggit
@@ -115,10 +128,23 @@
 src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
    (current-buffer)))
 
+
 ;; Python Mode
-(elpy-enable)
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t)
+
+;; https://github.com/jorgenschaefer/elpy
+(require 'package)
+(add-to-list 'package-archives
+	     '("elpy" . "https://jorgenschaefer.github.io/packages/"))
+
+
+
+; try to automagically figure out indentation
+(setq py-smart-indentation t)
+;; set tabs to spaces and set tab width to 4
+(add-hook 'python-mode-hook
+	  (function (lambda ()
+		      (setq indent-tabs-mode nil
+			    tab-width 4))))
 
 ;; Web Mode
 (require 'web-mode)
@@ -134,26 +160,6 @@ src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>" (buffer-subs
 (setq web-mode-enable-auto-expanding t)
 (setq web-mode-enable-css-colorization t)
 
-
-
-;; www.jesshamrick.com/2012/09/18/emacs-as-a-python-ide/
-;;(require 'python-mode)
-; use IPython
-;;(setq-default py-shell-name "ipython")
-;;(setq-default py-which-bufname "IPython")
-; use the wx backend, for both mayavi and matplot lib
-;;(setq py-python-command-args
-;;      '("--gui=wx" "--pylab=wx" "--colors" "Linux"))
-;;(setq py-force-py-shell-name-p t)
-
-; switch to the interpreter after executing code
-;;(setq py-shell-switch-buffers-on-execute-p t)
-;;(setq py-switch-buffers-on-execute-p t)
-; don't split windows
-;;(setq py-split-windows-on-execute-p nil)
-; try to automagically figure out indentation
-;;(setq py-smart-indentation t)
-
 		    		     
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -167,7 +173,7 @@ src=\"http://strapdownjs.com/v/0.2/strapdown.js\"></script></html>" (buffer-subs
  '(linum-format " %7i ")
  '(package-selected-packages
    (quote
-    (web-mode-edit-element web-mode jedi elpy auto-complete anaconda-mode py-autopep8 impatient-mode groovy-mode sublime-themes markdown-mode))))
+    (projectile web-mode-edit-element web-mode jedi elpy auto-complete anaconda-mode py-autopep8 impatient-mode groovy-mode sublime-themes markdown-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
